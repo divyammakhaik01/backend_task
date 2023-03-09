@@ -62,7 +62,6 @@ const findUserByEmail = async(email) =>{
     return user ; 
 }
 
-
 const editProfile = async(newEmail , newUsername , newAge) => {
 
     const user = await findUserByEmail(newEmail) ; 

@@ -1,5 +1,21 @@
 const User = require("../models/user.model");
 
+const findUserByUsername = async(username) => {
+  return await User.findOne({ username });
+}
+
+const checkPassword = async(password) => {
+  const user = await findUserByUsername(username)
+  const match = await user.checkPassword(password);
+
+}
+
+const getJWTToken = async() =>{
+  const user = await findUserByUsername(username)
+  return user.getJwtToken();
+}
+
+
 const login = async (req, res) => {
   //login api logic here
   try {
@@ -11,8 +27,8 @@ const login = async (req, res) => {
         statusCode: 400,
       });
     }
-
-    const user = await User.findOne({ username });
+    
+    const user = await findUserByUsername(username)
 
     if (!user) {
       return res.json({
@@ -21,7 +37,7 @@ const login = async (req, res) => {
       });
     }
 
-    const match = await user.checkPassword(password);
+    const match = await checkPassword(password)
 
     if (!match) {
       return res.json({
@@ -30,7 +46,7 @@ const login = async (req, res) => {
       });
     }
 
-    const token = user.getJwtToken();
+    const token = await getJWTToken();x
     //
     req.user = user;
     res.status(200).json({ success: true, token, user });
@@ -42,7 +58,7 @@ const login = async (req, res) => {
   }
 };
 
-const register = async (req, res) => {
+const register = async(req, res) => {
   try {
     const { email, username, password } = req.body;
 
@@ -52,13 +68,12 @@ const register = async (req, res) => {
         message: "email or username or password not found ",
       });
     }
+
     const finduser = await User.find({
       email: email,
       username: username,
       password: password,
     });
-
-    // check whether user already registered
 
     if (finduser.length != 0) {
       return res.json({
@@ -83,22 +98,6 @@ const register = async (req, res) => {
     });
   }
 };
-
-// const logout = async (req,res) => {
-
-//     try {
-
-
-        
-//     } catch (error) {
-//         return res.json({
-//             "status" :"false" , 
-//             "message" : error
-//         })
-//     }
-    
-// }
-
 
 const AuthController = {
   login,
